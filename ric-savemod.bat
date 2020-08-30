@@ -70,9 +70,10 @@ ECHO.
 
 CHOICE /C 12 /M "Twoj wybor:"
 
-IF ERRORLEVEL 2 set "ImportPath=%~dp0"
-IF ERRORLEVEL 1 set "ImportPath=%LOCALAPPDATA%\VirtualStore%~p0"
+IF ERRORLEVEL 2 set "ImportPath=%LOCALAPPDATA%\VirtualStore%~p0" && goto Import
+IF ERRORLEVEL 1 set "ImportPath=%~dp0" && goto Import
 
+:Import
 for %%f in (0, 1, 2, 3, 4) do (
 	for %%A in ("%ImportPath%Common\*") do @echo %%A | >nul findstr %%f.ARR && xcopy "%%A" "%ImportPath%Common\save\slot%%f\" /y /q && echo Importowanie %%~nxA
 	for %%A in ("%ImportPath%Common\*") do @echo %%A | >nul findstr %%f.DTA && xcopy "%%A" "%ImportPath%Common\save\slot%%f\" /y /q && echo Importowanie %%~nxA
