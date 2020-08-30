@@ -8,7 +8,7 @@ A mod for Rex and Wizards game that reorganizes save-state files.
 * Copy contents of the archive to your game's installation folder (e.g. *"C:/Program Files/AidemMedia/Reksio i Czarodzieje"*)
 * Start the "*ric-savemod.bat*" file and continue with instructions on screen.
 
-Before changing any files, the script crates backups of all the required files, and saves them with **.bak* extension. Those files can be restored using the second *(2)* option in the installer.
+Before changing any files, the script crates **backups** of all the required files, and saves them with **.bak* extension. Those files can be restored using the second *(2)* option in the installer.
 
 ### ! Important:
 If the game is installed in a folder on system drive, running the .bat file as **Administrator** is required! Otherwise the script can't modify any files.
