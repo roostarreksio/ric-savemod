@@ -37,7 +37,12 @@ echo Modyfikacja plikow: && echo.
 for /F "usebackq delims=" %%f in ("%~dp0modfiles\fullpatch.txt") do "%~dp0modfiles\fart.exe" "%~dp0%%f
 
 echo. && echo Wgrywanie nowej struktury plikow zapisu: && echo.
-xcopy "%~dp0modfiles\save" "%~dp0Common\save\" /E /I /S /Y /D
+
+for %%S in (save, save\slot0, save\slot1, save\slot2, save\slot3, save\slot4) do (
+	for %%F in ("%~dp0modfiles\%%S\*") do if not exist "%~dp0Common\%%S\%%~nxF" (
+	xcopy "%%F" "%~dp0Common\%%S\" /Y /Q && echo Utworzono %%S\%%~nxF) else (echo %%S\%%~nxF juz istnieje)
+)
+if not exist "%~dp0Common\save\slot0\" (mkdir "%~dp0Common\save\slot0" && echo Utworzono save\slot0\) else (echo save\slot0\ juz istnieje)
 
 echo. && echo Koniec instalacji && echo.
 
