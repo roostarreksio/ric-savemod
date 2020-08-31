@@ -17,8 +17,10 @@ IF ERRORLEVEL 1 GOTO Zainstaluj
 
 :Zainstaluj
 
+:: Backup files creation
 for /F "usebackq delims=" %%G in ("%~dp0modfiles\modfilelist.txt") do if not exist "%~dp0%%G.bak" copy "%~dp0%%G" "%~dp0%%G.bak" && echo Backup %%~nxG && echo.
 
+:: Converting EOL characters from Unix to Windows and decoding files with AMkd
 for /F "usebackq delims=" %%G in ("%~dp0modfiles\modfilelist.txt") do (
 	echo %%~nxG:
 	echo Konwersja EOL
@@ -34,10 +36,12 @@ for /F "usebackq delims=" %%G in ("%~dp0modfiles\modfilelist.txt") do (
 
 echo Modyfikacja plikow: && echo.
 
+:: Applying changes from fullpatch.txt to all the files using fart-it
 for /F "usebackq delims=" %%f in ("%~dp0modfiles\fullpatch.txt") do "%~dp0modfiles\fart.exe" "%~dp0%%f
 
 echo. && echo Wgrywanie nowej struktury plikow zapisu: && echo.
 
+:: Copying required basic save folder contents if they don't exist
 for %%S in (save, save\slot0, save\slot1, save\slot2, save\slot3, save\slot4) do (
 	for %%F in ("%~dp0modfiles\%%S\*") do if not exist "%~dp0Common\%%S\%%~nxF" (
 	xcopy "%%F" "%~dp0Common\%%S\" /Y /Q && echo Utworzono %%S\%%~nxF) else (echo %%S\%%~nxF juz istnieje)
@@ -52,6 +56,7 @@ GOTO End
 
 :Odinstaluj
 
+:: Restore the backup files if present
 for /F "usebackq delims=" %%G in ("%~dp0modfiles\modfilelist.txt") do (
 	if exist "%~dp0%%G.bak" (
 	xcopy "%~dp0%%G.bak" "%~dp0%%G" /Y /q && del "%~dp0%%G.bak" && echo Przywrocono kopie zapasowa %%~nxG
@@ -79,20 +84,24 @@ IF ERRORLEVEL 2 set "ImportPath=%LOCALAPPDATA%\VirtualStore%~p0" && goto Import
 IF ERRORLEVEL 1 set "ImportPath=%~dp0" && goto Import
 
 :Import
+
+:: Find all DTA and ARR files with filenames ending with a number in Common and copy them to the save\slotX folder
 for %%f in (0, 1, 2, 3, 4) do (
 	for %%A in ("%ImportPath%Common\*") do @echo %%A | >nul findstr %%f.ARR && xcopy "%%A" "%ImportPath%Common\save\slot%%f\" /y /q && echo Importowanie %%~nxA
 	for %%A in ("%ImportPath%Common\*") do @echo %%A | >nul findstr %%f.DTA && xcopy "%%A" "%ImportPath%Common\save\slot%%f\" /y /q && echo Importowanie %%~nxA
 )
 
+:: Copy m_shot.img and some other required files
 for %%f in (1, 2, 3, 4) do xcopy "%ImportPath%Common\m_shot%%f.img" "%ImportPath%Common\save\slot%%f\" /y /q && echo Importowanie m_shot%%f.img
 
 for %%f in (PAGE.IMG, SAVE.IMG, SETTINGS.ARR, ZOOM.IMG) do xcopy "%ImportPath%Common\%%f" "%ImportPath%Common\save\" /y /q && echo Importowanie %%~nxf
 
 xcopy "%ImportPath%Common\DODOS*.SAV" "%ImportPath%Common\save\" /y /q && echo Importowanie DODOS.SAV
 
-@echo off
+
 setlocal enabledelayedexpansion
 
+:: Rename files in slotX folders to remove the last digit from their filename (the number)
 for %%b in (0, 1, 2, 3, 4) do (
 	for %%f in ("%ImportPath%Common\save\slot%%b\*%%b.???") do (
 		set "filename=%%~nf"
